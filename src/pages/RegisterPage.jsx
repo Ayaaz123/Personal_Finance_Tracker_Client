@@ -35,25 +35,22 @@ const RegisterPage = () => {
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          "url('https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=2070&auto=format&fit=crop')",
       }}
     >
-      
       <div className="w-full max-w-md bg-white bg-opacity-80 p-6 rounded shadow">
         <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
           Register
         </h2>
         {error && <p className="text-red-500 mb-2">{error}</p>}
         <form onSubmit={handleRegister}>
-         
           <div className="mb-4">
             <label className="block mb-1 text-gray-700">First Name</label>
             <input
               name="firstName"
               type="text"
               placeholder="Enter your first name"
-              className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+              className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
               value={formData.firstName}
               onChange={handleChange}
               required
@@ -65,8 +62,7 @@ const RegisterPage = () => {
               name="lastName"
               type="text"
               placeholder="Enter your last name"
-              className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+              className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
               value={formData.lastName}
               onChange={handleChange}
               required
@@ -78,8 +74,7 @@ const RegisterPage = () => {
               name="email"
               type="email"
               placeholder="you@example.com"
-              className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+              className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
               value={formData.email}
               onChange={handleChange}
               required
@@ -113,8 +108,7 @@ const RegisterPage = () => {
               name="address"
               type="text"
               placeholder="Enter your address"
-              className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+              className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
               value={formData.address}
               onChange={handleChange}
             />
@@ -123,8 +117,7 @@ const RegisterPage = () => {
             <label className="block mb-1 text-gray-700">Gender</label>
             <select
               name="gender"
-              className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+              className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
               value={formData.gender}
               onChange={handleChange}
             >
@@ -134,12 +127,9 @@ const RegisterPage = () => {
               <option value="Other">Other</option>
             </select>
           </div>
-
-          {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white py-2 rounded 
-                       hover:bg-purple-700"
+            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
           >
             Register
           </button>

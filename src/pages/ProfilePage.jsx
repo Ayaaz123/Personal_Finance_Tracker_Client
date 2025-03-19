@@ -1,10 +1,8 @@
-// src/pages/ProfilePage.jsx
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosConfig";
 import { toast } from "react-toastify";
 
 const ProfilePage = () => {
-  // Profile state
   const [profile, setProfile] = useState({
     id: "",
     email: "",
@@ -16,11 +14,9 @@ const ProfilePage = () => {
     profilePictureUrl: "",
   });
 
-  // File input state for profile picture
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch the user's profile from the backend
   const fetchProfile = async () => {
     try {
       const response = await axiosInstance.get("/api/User");
@@ -33,17 +29,16 @@ const ProfilePage = () => {
     }
   };
 
-  // On component mount, load the profile
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  // Handle file input change
+
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
-  // Upload the selected file, then re-fetch the profile
+
   const handleUpload = async () => {
     if (!selectedFile) return;
     try {
@@ -54,7 +49,7 @@ const ProfilePage = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      await fetchProfile(); // Re-fetch to get the updated ProfilePictureUrl
+      await fetchProfile();
       toast.success("Profile picture updated!");
     } catch (error) {
       console.error("Error uploading profile picture:", error);
@@ -62,12 +57,12 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle input changes for profile fields
+ 
   const handleInputChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  // Update profile info (firstName, lastName, dateOfBirth, address, gender)
+  
   const handleUpdateProfile = async () => {
     try {
       const { firstName, lastName, dateOfBirth, address, gender } = profile;
@@ -79,7 +74,7 @@ const ProfilePage = () => {
         gender,
       });
       toast.success("Profile updated!");
-      fetchProfile(); // Refresh data
+      fetchProfile();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Error updating profile.");

@@ -1,81 +1,52 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  getExpenses,
-  createExpense,
-  deleteExpense,
-  updateExpense,
-} from "../api/expenses";
+  fetchExpenses,
+  addExpense,
+  removeExpense,
+  modifyExpense,
+} from "../features/expenses/expenseSlice";
 import Calculator from "../components/Calculator";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [showCalculator, setShowCalculator] = useState(false);
-
+  const dispatch = useDispatch();
+  const expenses = useSelector((state) => state.expenses.items);
+  const loading = useSelector((state) => state.expenses.loading);
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
-
-
   const [editingExpense, setEditingExpense] = useState(null);
-
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [showCalculator, setShowCalculator] = useState(false);
 
   useEffect(() => {
-    fetchExpenses();
-  }, []);
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
-  const fetchExpenses = async () => {
-    try {
-      const response = await getExpenses();
-      setExpenses(response.data);
-    } catch (error) {
-      console.error("Failed to fetch expenses:", error);
-    }
-  };
-
-  const handleAddExpense = async (e) => {
+  const handleAddExpense = (e) => {
     e.preventDefault();
     if (!description || !amount || !date || !category) {
       alert("Please fill all fields.");
       return;
     }
-    try {
-      const response = await createExpense({
-        description,
-        amount,
-        date,
-        category,
-      });
-      setExpenses([...expenses, response.data]);
-      setDescription("");
-      setAmount("");
-      setDate("");
-      setCategory("");
-    } catch (error) {
-      console.error("Failed to create expense:", error);
-    }
+    dispatch(addExpense({ description, amount, date, category }));
+    setDescription("");
+    setAmount("");
+    setDate("");
+    setCategory("");
   };
 
-
-  const handleDeleteExpense = async (id) => {
+  const handleDeleteExpense = (id) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
-    try {
-      await deleteExpense(id);
-      setExpenses(expenses.filter((exp) => exp.id !== id));
-    } catch (error) {
-      console.error("Failed to delete expense:", error);
-    }
+    dispatch(removeExpense(id));
   };
-
 
   const handleEditClick = (expense) => {
     setEditingExpense(expense);
   };
-
 
   const handleEditChange = (e) => {
     setEditingExpense({
@@ -84,8 +55,7 @@ const DashboardPage = () => {
     });
   };
 
-
-  const handleUpdateExpense = async (e) => {
+  const handleUpdateExpense = (e) => {
     e.preventDefault();
     if (
       !editingExpense.description ||
@@ -96,22 +66,9 @@ const DashboardPage = () => {
       alert("Please fill all fields in the edit form.");
       return;
     }
-    try {
-      await updateExpense(editingExpense.id, {
-        description: editingExpense.description,
-        amount: editingExpense.amount,
-        date: editingExpense.date,
-        category: editingExpense.category,
-      });
-
-      fetchExpenses();
-
-      setEditingExpense(null);
-    } catch (error) {
-      console.error("Failed to update expense:", error);
-    }
+    dispatch(modifyExpense({ id: editingExpense.id, updatedData: editingExpense }));
+    setEditingExpense(null);
   };
-
 
   const handleCancelEdit = () => {
     setEditingExpense(null);
@@ -129,7 +86,6 @@ const DashboardPage = () => {
           "url('https://t4.ftcdn.net/jpg/02/10/45/95/360_F_210459536_XmLDEcKq2DpeNLVmheuWeu9NM9aGKnih.jpg')",
       }}
     >
-      {/* Navbar */}
       <nav className="bg-purple-600 px-4 py-2 flex justify-between items-center">
         <div className="text-white font-bold text-xl">Expense Manager</div>
         <div className="flex items-center space-x-2">
@@ -140,55 +96,37 @@ const DashboardPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded px-3 py-1"
           />
-          
           <Link
             to="/profile"
-            className="
-              text-black 
-              bg-white 
-              px-3 
-              py-1 
-              rounded 
-              hover:bg-gray-200 
-              transition-colors
-            "
+            className="text-black bg-white px-3 py-1 rounded hover:bg-gray-200 transition-colors"
           >
             Profile
           </Link>
           <Link
             to="/"
             onClick={() => localStorage.clear()}
-            className="
-              text-black 
-              bg-white 
-              px-3 
-              py-1 
-              rounded 
-              hover:bg-gray-200 
-              transition-colors
-            "
+            className="text-black bg-white px-3 py-1 rounded hover:bg-gray-200 transition-colors"
           >
             Logout
           </Link>
         </div>
       </nav>
+
       <div className="flex-1 p-4 bg-white bg-opacity-80">
+        {loading && <p>Loading expenses...</p>}
         <div
           className={`grid gap-4 mb-6 ${
             editingExpense ? "grid-cols-2" : "grid-cols-1"
           }`}
         >
           <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold mb-2 text-gray-800">
-              Add an Expense
-            </h2>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800">Add an Expense</h2>
             <form onSubmit={handleAddExpense}>
               <div className="mb-2">
                 <label className="block text-gray-700">Description</label>
                 <input
                   type="text"
-                  className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+                  className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                   placeholder="Enter description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -199,8 +137,7 @@ const DashboardPage = () => {
                 <label className="block text-gray-700">Amount</label>
                 <input
                   type="number"
-                  className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+                  className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                   placeholder="Enter amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
@@ -211,8 +148,7 @@ const DashboardPage = () => {
                 <label className="block text-gray-700">Date</label>
                 <input
                   type="date"
-                  className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+                  className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
@@ -222,8 +158,7 @@ const DashboardPage = () => {
                 <label className="block text-gray-700">Category</label>
                 <input
                   type="text"
-                  className="w-full border border-gray-600 px-3 py-2 rounded
-                             bg-gray-800 text-white placeholder-gray-300"
+                  className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                   placeholder="Enter category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -240,17 +175,14 @@ const DashboardPage = () => {
           </div>
           {editingExpense && (
             <div className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                Edit Expense
-              </h2>
+              <h2 className="text-xl font-semibold mb-2 text-gray-800">Edit Expense</h2>
               <form onSubmit={handleUpdateExpense}>
                 <div className="mb-2">
                   <label className="block text-gray-700">Description</label>
                   <input
                     type="text"
                     name="description"
-                    className="w-full border border-gray-600 px-3 py-2 rounded
-                               bg-gray-800 text-white placeholder-gray-300"
+                    className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                     value={editingExpense.description}
                     onChange={handleEditChange}
                     required
@@ -261,8 +193,7 @@ const DashboardPage = () => {
                   <input
                     type="number"
                     name="amount"
-                    className="w-full border border-gray-600 px-3 py-2 rounded
-                               bg-gray-800 text-white placeholder-gray-300"
+                    className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                     value={editingExpense.amount}
                     onChange={handleEditChange}
                     required
@@ -273,8 +204,7 @@ const DashboardPage = () => {
                   <input
                     type="date"
                     name="date"
-                    className="w-full border border-gray-600 px-3 py-2 rounded
-                               bg-gray-800 text-white placeholder-gray-300"
+                    className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                     value={editingExpense.date?.substring(0, 10) || ""}
                     onChange={handleEditChange}
                     required
@@ -285,8 +215,7 @@ const DashboardPage = () => {
                   <input
                     type="text"
                     name="category"
-                    className="w-full border border-gray-600 px-3 py-2 rounded
-                               bg-gray-800 text-white placeholder-gray-300"
+                    className="w-full border border-gray-600 px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-300"
                     value={editingExpense.category}
                     onChange={handleEditChange}
                     required
@@ -312,9 +241,7 @@ const DashboardPage = () => {
           )}
         </div>
         <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">
-            Recent Expenses
-          </h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-800">Recent Expenses</h2>
           <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-200">

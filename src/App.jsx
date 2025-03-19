@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { Provider } from "react-redux";
+import store from "./store";
+
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -8,7 +10,6 @@ import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -20,14 +21,11 @@ function ProtectedRoute({ children }) {
 
 const App = () => {
   return (
-    <AuthProvider>
-      
+    <Provider store={store}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
-        
         <Route
           path="/dashboard"
           element={
@@ -45,8 +43,6 @@ const App = () => {
           }
         />
       </Routes>
-
-      
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -58,7 +54,7 @@ const App = () => {
         draggable
         pauseOnHover
       />
-    </AuthProvider>
+    </Provider>
   );
 };
 

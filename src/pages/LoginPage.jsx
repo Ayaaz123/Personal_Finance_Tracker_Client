@@ -1,21 +1,21 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { loginUser } from "../api/auth";
+import { loginSuccess } from "../features/auth/authSlice";
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const { login } = useContext(AuthContext);
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password });
-      login(response.data.user, response.data.token);
+      dispatch(loginSuccess({ user: response.data.user, token: response.data.token }));
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data || "Login failed");
@@ -27,7 +27,7 @@ const LoginPage = () => {
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          "url('https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=2070&auto=format&fit=crop')",
       }}
     >
       <div className="bg-white bg-opacity-80 w-full max-w-sm p-6 rounded shadow">
